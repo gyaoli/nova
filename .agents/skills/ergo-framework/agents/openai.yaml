@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ergo 框架开发"
+  short_description: "设计、实现和审查 Ergo Actor 系统"
+  default_prompt: "使用 $ergo-framework 基于源码 API 分析、设计或实现这个 Ergo v330 改动。"
+policy:
+  allow_implicit_invocation: true

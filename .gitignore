@@ -1,0 +1,40 @@
+# Go build and test artifacts
+/.gocache/
+/.gomodcache/
+*.test
+*.out
+*.prof
+*.pprof
+/coverage/
+coverage.*
+
+# Nova binaries and runtime state
+/nova
+/nova.exe
+/*.pid
+/*.stdout.log
+/syslog/
+*.log
+
+# Local configuration overrides
+/.env
+/.env.*
+/env.local.yaml
+/env.*.local.yaml
+
+# IDE and editor files
+/.idea/
+/.vscode/
+*.iml
+*.swp
+*.swo
+*~
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp

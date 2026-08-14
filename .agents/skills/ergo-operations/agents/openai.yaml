@@ -1,0 +1,6 @@
+interface:
+  display_name: "Ergo 运维诊断"
+  short_description: "安全诊断 Ergo 集群问题"
+  default_prompt: "使用 $ergo-operations 以只读、有界的证据调查这个 Ergo 集群症状。"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package nova.protocol.game;
+
+option go_package = "nova/protocol/game;gamepb";
+
+message LoginRequest {
+  string account = 1;
+  string token = 2;
+  string platform = 3;
+  uint32 zone_id = 4;
+}
+
+message LoginResponse {
+  int32 code = 1;
+  string message = 2;
+  bool need_create = 3;
+  RoleSummary role = 4;
+}
+
+message CreateRoleRequest {
+  string name = 1;
+  string operation_id = 2;
+}
+
+message CreateRoleResponse {
+  int32 code = 1;
+  string message = 2;
+  RoleSummary role = 3;
+}
+
+message HeartbeatRequest {
+  uint64 client_time = 1;
+}
+
+message HeartbeatResponse {
+  uint64 client_time = 1;
+  int64 server_time = 2;
+}
+
+message RoleSummary {
+  uint64 role_id = 1;
+  string name = 2;
+  uint32 level = 3;
+  string platform = 4;
+  uint32 zone_id = 5;
+}
+
+message RoleData {
+  uint32 schema_version = 1;
+}

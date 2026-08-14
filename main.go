@@ -2,63 +2,21 @@ package main
 
 import (
 	"fmt"
-	"nova/core/actor"
-	"nova/logo"
+	"nova/log"
 	"nova/node"
-
-	console "github.com/asynkron/goconsole"
+	"os"
 )
 
-type sayHello struct {
-	actor.ActorBase
-}
-
-func (s sayHello) OnStart(ctx actor.Context) {
-
-}
-
-func (s sayHello) OnhandleSend(ctx actor.Context, massage interface{}) {
-	fmt.Println(massage)
-}
-
-func (s sayHello) OnhandleCall(ctx actor.Context, message interface{}) (reply interface{}) {
-	return nil
-
-}
-
-type sayBye struct {
-	actor.ActorBase
-}
-
-func (s sayBye) OnhandleSend(ctx actor.Context, massage interface{}) {
-	switch msg := massage.(type) {
-	case string:
-		fmt.Println(msg)
-		ctx.Send(ctx.Sender(), "yaa,i am bye")
-	}
-}
-
-func (s sayBye) OnhandleCall(ctx actor.Context, message interface{}) (reply interface{}) {
-	return nil
-
-}
-
 func main() {
-	logo.Print()
-	node.Start()
-
-	hello, err := actor.Spawn(&sayHello{})
-	if err != nil {
+	if err := node.Start(); err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if !node.IsRunning() {
 		return
 	}
+	defer func() { _ = log.Sync() }()
 
-	bye, err := actor.Spawn(&sayBye{})
-	if err != nil {
-		return
-	}
-
-	_ = hello.Send(bye.Pid(), "hi! i am hello")
-
-	_, _ = console.ReadLine()
+	node.Node().Wait()
 
 }

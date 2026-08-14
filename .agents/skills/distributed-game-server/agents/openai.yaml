@@ -1,0 +1,6 @@
+interface:
+  display_name: "分布式游戏服务端"
+  short_description: "设计生产级游戏服务端"
+  default_prompt: "使用 $distributed-game-server 设计这个游戏服务，明确状态归属、一致性、容量与恢复方案。"
+policy:
+  allow_implicit_invocation: true

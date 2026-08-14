@@ -2,31 +2,33 @@ package env
 
 import (
 	"fmt"
-	"github.com/fsnotify/fsnotify"
+	"path/filepath"
+	"strings"
+
 	"github.com/spf13/viper"
 )
 
-var (
-	NodeEnv = &NodeConfig{}
-)
+// Load parses and validates one YAML service configuration without changing
+// the active configuration. Unknown fields are rejected to catch typos early.
+func Load(configFile string) (NodeConfig, error) {
+	configFile = strings.TrimSpace(configFile)
+	if configFile == "" {
+		return NodeConfig{}, fmt.Errorf("config file cannot be empty")
+	}
 
-func parser() {
 	v := viper.New()
-	configFile := "./env.yaml"
-	v.SetConfigFile(configFile)
+	v.SetConfigFile(filepath.Clean(configFile))
+	v.SetConfigType("yaml")
 	if err := v.ReadInConfig(); err != nil {
-		panic(err)
+		return NodeConfig{}, fmt.Errorf("read config %q: %w", configFile, err)
 	}
-	if err := v.Unmarshal(&NodeEnv); err != nil {
-		panic(err)
+
+	var config NodeConfig
+	if err := v.UnmarshalExact(&config); err != nil {
+		return NodeConfig{}, fmt.Errorf("decode config %q: %w", configFile, err)
 	}
-	v.WatchConfig()
-	v.OnConfigChange(func(in fsnotify.Event) {
-		if err := v.ReadInConfig(); err != nil {
-			fmt.Printf("OnConfigChange ReadInConfig err. %s", err.Error())
-		}
-		if err := v.Unmarshal(&NodeEnv); err != nil {
-			fmt.Printf("OnConfigChange Unmarshal err. %s", err.Error())
-		}
-	})
+	if err := config.validate(); err != nil {
+		return NodeConfig{}, fmt.Errorf("validate config %q: %w", configFile, err)
+	}
+	return config, nil
 }

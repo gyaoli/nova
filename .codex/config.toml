@@ -1,0 +1,7 @@
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 5
+
+# 项目 skill 会从 .agents/skills 自动发现。
+# Ergo MCP 端点请配置在用户本地或部署专用的 Codex 配置中；
+# 不得在此提交生产端点或 Bearer Token。

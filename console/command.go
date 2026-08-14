@@ -59,7 +59,6 @@ func (c *Command) execute() error {
 
 func Run(args []string) error {
 	flag.Parse()
-	fmt.Println("args", args)
 	for _, cmd := range CommandList {
 		err := cmd.execute()
 		if err != nil {
