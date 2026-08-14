@@ -28,6 +28,7 @@ type Provider interface {
 	Acquire(Options) (*Lease, error)
 }
 
+// Application owns the node-local infrastructure resource lifecycle.
 type Application struct {
 	app.Application
 	config  configenv.NodeConfig

@@ -7,11 +7,11 @@ import (
 	"ergo.services/ergo/gen"
 )
 
-type httpOwner struct{ act.Actor }
+type httpManager struct{ act.Actor }
 
-func createHTTPOwner() gen.ProcessBehavior { return &httpOwner{} }
+func createHTTPManager() gen.ProcessBehavior { return &httpManager{} }
 
-func (h *httpOwner) Init(args ...any) error {
+func (h *httpManager) Init(args ...any) error {
 	if len(args) != 1 {
 		return fmt.Errorf("account http owner expects application argument")
 	}

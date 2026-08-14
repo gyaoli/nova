@@ -1,4 +1,4 @@
-package zone
+package role
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 
 	clusterproto "nova/protocol/cluster"
 	gamepb "nova/protocol/game"
-	"nova/service/role"
 
 	"ergo.services/ergo/gen"
 	"google.golang.org/protobuf/proto"
@@ -19,18 +18,18 @@ type roleJob struct {
 
 type roleJobResult struct {
 	packet clusterproto.MessageGatewayPacket
-	role   role.Role
+	role   Role
 	err    error
 }
 
 type roleWorker struct {
 	gen.MetaProcess
-	service *role.Service
+	service *Service
 	jobs    chan roleJob
 	done    chan struct{}
 }
 
-func newRoleWorker(service *role.Service) *roleWorker {
+func newRoleWorker(service *Service) *roleWorker {
 	return &roleWorker{service: service, jobs: make(chan roleJob, 256), done: make(chan struct{})}
 }
 
@@ -50,13 +49,13 @@ func (w *roleWorker) Start() error {
 			} else {
 				var request gamepb.CreateRoleRequest
 				if err := proto.Unmarshal(job.packet.Body, &request); err != nil || strings.TrimSpace(request.Name) == "" || strings.TrimSpace(request.OperationId) == "" {
-					result.err = role.ErrInvalidArgument
+					result.err = ErrInvalidArgument
 				} else {
 					initial, err := proto.Marshal(&gamepb.RoleData{SchemaVersion: 1})
 					if err != nil {
 						result.err = err
 					} else {
-						result.role, result.err = w.service.Create(ctx, role.CreateCommand{Account: job.packet.Account, Platform: job.packet.Platform, ZoneID: int32(job.packet.ZoneID), Name: request.Name, RegIP: job.packet.RegIP, InitialData: initial})
+						result.role, result.err = w.service.Create(ctx, CreateCommand{Account: job.packet.Account, Platform: job.packet.Platform, ZoneID: int32(job.packet.ZoneID), Name: request.Name, RegIP: job.packet.RegIP, InitialData: initial})
 					}
 				}
 			}

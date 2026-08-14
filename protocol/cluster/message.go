@@ -21,8 +21,6 @@ const (
 	CodeInternal        int32 = 1006
 )
 
-const ZoneRouterName gen.Atom = "zone_router"
-
 type MessageGatewayPacket struct {
 	ReplyTo      gen.ProcessID
 	SessionID    uint64

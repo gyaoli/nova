@@ -7,11 +7,11 @@ import (
 	"ergo.services/ergo/gen"
 )
 
-type owner struct{ act.Actor }
+type resourceManager struct{ act.Actor }
 
-func createOwner() gen.ProcessBehavior { return &owner{} }
+func createResourceManager() gen.ProcessBehavior { return &resourceManager{} }
 
-func (o *owner) Init(args ...any) error {
+func (m *resourceManager) Init(args ...any) error {
 	if len(args) != 1 {
 		return fmt.Errorf("resource owner expects application argument")
 	}

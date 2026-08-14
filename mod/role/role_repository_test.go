@@ -2,7 +2,7 @@ package role
 
 import "testing"
 
-func TestDuplicateKey(t *testing.T) {
+func TestRoleDuplicateKey(t *testing.T) {
 	tests := []struct {
 		message string
 		want    string

@@ -46,7 +46,7 @@ type Repository interface {
 	UpdateLastLogin(ctx context.Context, id int64, platform string, zoneID int32, loginTime int64) error
 }
 
-// Service implements the role domain operations.
+// Service implements the role module domain operations.
 type Service struct {
 	repository Repository
 	now        func() time.Time

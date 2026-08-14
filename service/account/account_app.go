@@ -16,6 +16,7 @@ const (
 	applicationName gen.Atom = "account"
 )
 
+// application owns the account module lifecycle.
 type application struct {
 	app.Application
 	config    configenv.NodeConfig

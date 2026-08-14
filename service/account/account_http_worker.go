@@ -20,7 +20,7 @@ const (
 	httpMaxHeaderBytes    = 16 << 10
 )
 
-// webServer keeps blocking HTTP accept/serve work inside an Ergo meta process.
+// webServer keeps blocking HTTP accept/serve work inside an Ergo worker meta process.
 type webServer struct {
 	gen.MetaProcess
 	listener net.Listener

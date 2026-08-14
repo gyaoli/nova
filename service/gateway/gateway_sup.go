@@ -12,6 +12,7 @@ const (
 	ownerName      gen.Atom = "gateway_writer"
 )
 
+// supervisor defines the Gateway failure boundary.
 type supervisor struct{ act.Supervisor }
 
 func createSupervisor() gen.ProcessBehavior { return &supervisor{} }
@@ -27,7 +28,7 @@ func (s *supervisor) Init(args ...any) (act.SupervisorSpec, error) {
 	return act.SupervisorSpec{
 		Type: act.SupervisorTypeOneForOne,
 		Children: []act.SupervisorChildSpec{{
-			Name: ownerName, Factory: createGateway, Args: []any{a.config},
+			Name: ownerName, Factory: createGatewayManager, Args: []any{a.config},
 			Options: gen.ProcessOptions{MailboxSize: 8192},
 		}},
 		Restart: act.SupervisorRestart{Strategy: act.SupervisorStrategyPermanent, Intensity: 5, Period: 30},

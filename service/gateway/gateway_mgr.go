@@ -14,6 +14,7 @@ import (
 	"ergo.services/ergo/meta"
 	"google.golang.org/protobuf/proto"
 	configenv "nova/core/env"
+	"nova/mod/role"
 	clusterproto "nova/protocol/cluster"
 	gamepb "nova/protocol/game"
 	"nova/protocol/wire"
@@ -28,7 +29,7 @@ type session struct {
 	zoneID   uint32
 }
 
-type gateway struct {
+type gatewayManager struct {
 	act.Actor
 	config      configenv.NodeConfig
 	server      gen.Alias
@@ -38,9 +39,9 @@ type gateway struct {
 	byID        map[uint64]gen.Alias
 }
 
-func createGateway() gen.ProcessBehavior { return &gateway{} }
+func createGatewayManager() gen.ProcessBehavior { return &gatewayManager{} }
 
-func (g *gateway) Init(args ...any) error {
+func (g *gatewayManager) Init(args ...any) error {
 	if len(args) != 1 {
 		return fmt.Errorf("gateway expects configuration")
 	}
@@ -67,7 +68,7 @@ func (g *gateway) Init(args ...any) error {
 	return err
 }
 
-func (g *gateway) HandleMessage(_ gen.PID, message any) error {
+func (g *gatewayManager) HandleMessage(_ gen.PID, message any) error {
 	switch m := message.(type) {
 	case meta.MessageTCPConnect:
 		id := g.nextSession.Add(1)
@@ -95,7 +96,7 @@ func (g *gateway) HandleMessage(_ gen.PID, message any) error {
 	return nil
 }
 
-func (g *gateway) handleFrame(connection gen.Alias, data []byte) error {
+func (g *gatewayManager) handleFrame(connection gen.Alias, data []byte) error {
 	s := g.connections[connection]
 	if s == nil {
 		return nil
@@ -132,7 +133,7 @@ func (g *gateway) handleFrame(connection gen.Alias, data []byte) error {
 	return nil
 }
 
-func (g *gateway) handleAuthResult(result authResult) error {
+func (g *gatewayManager) handleAuthResult(result authResult) error {
 	s := g.connections[result.job.connection]
 	if s == nil {
 		return nil
@@ -154,15 +155,15 @@ func (g *gateway) handleAuthResult(result authResult) error {
 	return g.forward(s, clusterproto.MsgLoginRequest, result.job.seq, nil)
 }
 
-func (g *gateway) forward(s *session, msgID, seq uint32, body []byte) error {
-	return g.SendImportant(gen.ProcessID{Name: clusterproto.ZoneRouterName, Node: gen.Atom(g.config.Gateway.ZoneNode)}, clusterproto.MessageGatewayPacket{
+func (g *gatewayManager) forward(s *session, msgID, seq uint32, body []byte) error {
+	return g.SendImportant(gen.ProcessID{Name: role.RouterManagerName, Node: gen.Atom(g.config.Gateway.ZoneNode)}, clusterproto.MessageGatewayPacket{
 		ReplyTo: gen.ProcessID{Name: ownerName, Node: g.Node().Name()}, SessionID: s.id,
 		SessionToken: s.token, Account: s.account, Platform: s.platform, ZoneID: s.zoneID,
 		RegIP: s.remoteIP, MsgID: msgID, Seq: seq, Body: append([]byte(nil), body...),
 	})
 }
 
-func (g *gateway) handleZoneResponse(response clusterproto.MessageGatewayResponse) error {
+func (g *gatewayManager) handleZoneResponse(response clusterproto.MessageGatewayResponse) error {
 	connection, ok := g.byID[response.SessionID]
 	if !ok {
 		return nil
@@ -174,7 +175,7 @@ func (g *gateway) handleZoneResponse(response clusterproto.MessageGatewayRespons
 	return g.write(connection, response.MsgID, response.Seq, response.Body)
 }
 
-func (g *gateway) sendError(connection gen.Alias, msgID, seq uint32, code int32, message string) error {
+func (g *gatewayManager) sendError(connection gen.Alias, msgID, seq uint32, code int32, message string) error {
 	var value proto.Message
 	if msgID == clusterproto.MsgLoginResponse {
 		value = &gamepb.LoginResponse{Code: code, Message: message}
@@ -185,7 +186,7 @@ func (g *gateway) sendError(connection gen.Alias, msgID, seq uint32, code int32,
 	return g.write(connection, msgID, seq, body)
 }
 
-func (g *gateway) write(connection gen.Alias, msgID, seq uint32, body []byte) error {
+func (g *gatewayManager) write(connection gen.Alias, msgID, seq uint32, body []byte) error {
 	data, err := wire.Encode(msgID, seq, body)
 	if err != nil {
 		return err

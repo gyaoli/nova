@@ -15,6 +15,7 @@ const (
 	applicationName gen.Atom = "gateway"
 )
 
+// application owns the Gateway lifecycle and Zone route.
 type application struct {
 	app.Application
 	config configenv.NodeConfig

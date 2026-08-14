@@ -9,7 +9,7 @@ import (
 	"ergo.services/ergo/gen"
 )
 
-func TestDisabledResourcesAreUnavailable(t *testing.T) {
+func TestResourceDisabledResourcesAreUnavailable(t *testing.T) {
 	application := NewApplication(configenv.NodeConfig{}, Options{})
 	if _, err := application.Acquire(Options{MySQL: true}); !errors.Is(err, ErrMySQLUnavailable) {
 		t.Fatalf("Acquire(MySQL) error = %v", err)

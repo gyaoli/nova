@@ -27,6 +27,7 @@ type roleModel struct {
 
 func (roleModel) TableName() string { return "role" }
 
+// mysqlRepository persists role snapshots for the role module.
 type mysqlRepository struct{ db *gorm.DB }
 
 func NewRepository(db *gorm.DB) Repository { return &mysqlRepository{db: db} }

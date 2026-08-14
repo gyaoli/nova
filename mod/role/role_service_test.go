@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// repositoryStub isolates role service tests from MySQL.
 type repositoryStub struct {
 	createValue Role
 	createRole  Role

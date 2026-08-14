@@ -1,18 +1,18 @@
-package zone
+package game
 
 import (
 	"time"
 
 	configenv "nova/core/env"
+	"nova/mod/role"
 	clusterproto "nova/protocol/cluster"
 	"nova/service/resource"
-	"nova/service/role"
 
 	"ergo.services/ergo/app"
 	"ergo.services/ergo/gen"
 )
 
-const applicationName gen.Atom = "zone"
+const applicationName gen.Atom = "game"
 
 type application struct {
 	app.Application
@@ -28,11 +28,11 @@ func NewApplication(config configenv.NodeConfig, resources resource.Provider) ge
 
 func (a *application) Load(args ...any) (gen.ApplicationSpec, error) {
 	return gen.ApplicationSpec{
-		Name: applicationName, Description: "Nova zone role service",
-		Version: gen.Version{Name: "zone", Release: "1.0.0"}, Mode: gen.ApplicationModePermanent,
+		Name: applicationName, Description: "Nova game logic modules",
+		Version: gen.Version{Name: "game", Release: "1.0.0"}, Mode: gen.ApplicationModePermanent,
 		Depends:     gen.ApplicationDepends{Applications: []gen.Atom{resource.ApplicationName}},
 		Network:     gen.ApplicationNetwork{RegisterTypes: clusterproto.RegisterTypes()},
-		Map:         map[string]gen.Atom{"router": clusterproto.ZoneRouterName},
+		Map:         map[string]gen.Atom{"role": role.RouterManagerName},
 		Group:       []gen.ApplicationMemberSpec{{Factory: createSupervisor, Name: supervisorName, Args: []any{a}}},
 		InitTimeout: 5 * time.Second, StopTimeout: 5 * time.Second,
 	}, nil

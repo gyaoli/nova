@@ -1,4 +1,4 @@
-package resource
+package account
 
 import (
 	"fmt"
@@ -8,26 +8,27 @@ import (
 )
 
 const (
-	supervisorName gen.Atom = "resource_sup"
-	ownerName      gen.Atom = "resource_owner"
+	supervisorName gen.Atom = "account_sup"
+	httpOwnerName  gen.Atom = "account_http"
 )
 
+// supervisor defines the account failure boundary.
 type supervisor struct{ act.Supervisor }
 
 func createSupervisor() gen.ProcessBehavior { return &supervisor{} }
 
 func (s *supervisor) Init(args ...any) (act.SupervisorSpec, error) {
 	if len(args) != 1 {
-		return act.SupervisorSpec{}, fmt.Errorf("resource supervisor expects application argument")
+		return act.SupervisorSpec{}, fmt.Errorf("account supervisor expects application argument")
 	}
-	a, ok := args[0].(*Application)
-	if !ok {
-		return act.SupervisorSpec{}, fmt.Errorf("invalid resource application")
+	a, ok := args[0].(*application)
+	if !ok || a.owner == nil {
+		return act.SupervisorSpec{}, fmt.Errorf("account application is not initialized")
 	}
 	return act.SupervisorSpec{
 		Type: act.SupervisorTypeOneForOne,
 		Children: []act.SupervisorChildSpec{{
-			Name: ownerName, Factory: createOwner, Args: []any{a},
+			Name: httpOwnerName, Factory: createHTTPManager, Args: []any{a},
 		}},
 		Restart: act.SupervisorRestart{
 			Strategy:  act.SupervisorStrategyPermanent,

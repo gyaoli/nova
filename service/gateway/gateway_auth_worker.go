@@ -23,6 +23,7 @@ type authResult struct {
 	valid bool
 }
 
+// authWorker performs bounded blocking calls to the account verifier.
 type authWorker struct {
 	gen.MetaProcess
 	url    string

@@ -5,10 +5,10 @@ import (
 	"nova/console"
 	configenv "nova/core/env"
 	"nova/log"
+	"nova/mod/game"
 	"nova/service/account"
 	"nova/service/gateway"
 	"nova/service/resource"
-	"nova/service/zone"
 	"os"
 	"path/filepath"
 	"strings"
@@ -243,7 +243,7 @@ func nodeOptions(config configenv.NodeConfig, fileConfig log.FileConfig) gen.Nod
 		options.Applications = []gen.ApplicationBehavior{gateway.NewApplication(config)}
 	case "zone":
 		resources := resource.NewApplication(config, resource.Options{MySQL: true})
-		options.Applications = []gen.ApplicationBehavior{resources, zone.NewApplication(config, resources)}
+		options.Applications = []gen.ApplicationBehavior{resources, game.NewApplication(config, resources)}
 	}
 	return options
 }
